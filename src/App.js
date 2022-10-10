@@ -8,7 +8,6 @@ export default function App() {
       <header className="App-header">
         <img src={ logo } className="App-logo" alt="logo" />
         <p>SUA VEZ</p>
-        <p>First commit</p>
       </header>
     </div>
   );

@@ -27,15 +27,6 @@ class Login extends React.Component {
     this.setState({ isBtnDisabled: !(verifyEmail && verifyName) }); // false
   };
 
-  // handleBtn = (e) => {
-  //   e.preventDefault();
-  //   const { history, dispatch } = this.props; // Foi usado o dispatch para pegar o email, e o history para ao clicar no botao ir para a pagina de carteira
-  //   // const { email } = this.state;
-  //   dispatch(getEmail(email));
-  //   // dispatch(getRequest()); // faz a requisicao ao clicar no botao
-  //   history.push('/telaprincipal');
-  // };
-
   render() {
     const { isBtnDisabled } = this.state;
     return (

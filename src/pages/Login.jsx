@@ -16,7 +16,6 @@ class Login extends React.Component {
 
   isNameValid = (name) => {
     const nameRegex = /^[a-zA-Zà-úÀ-Ú\s]+$/;
-    // const nameRegex = regexp.Compile(`^[a-zA-Zà-úÀ-Ú\s]$`)
     return nameRegex.test(name);
   };
 
@@ -26,7 +25,6 @@ class Login extends React.Component {
     const verifyEmail = Emailregex.test(email); // true
     const verifyName = this.isNameValid(name); // true
     this.setState({ isBtnDisabled: !(verifyEmail && verifyName) }); // false
-    console.log(email, name, verifyEmail, verifyName);
   };
 
   // handleBtn = (e) => {
@@ -35,7 +33,7 @@ class Login extends React.Component {
   //   // const { email } = this.state;
   //   dispatch(getEmail(email));
   //   // dispatch(getRequest()); // faz a requisicao ao clicar no botao
-  //   history.push('/carteira');
+  //   history.push('/telaprincipal');
   // };
 
   render() {

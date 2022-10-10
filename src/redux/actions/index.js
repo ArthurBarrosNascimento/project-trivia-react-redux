@@ -2,6 +2,7 @@
 export const ADD_EMAIL = 'ADD_EMAIL';
 export const SUCESS_REQUIRE = 'SUCESS_REQUIRE';
 export const FAILURE_REQUIRE = 'FAILURE_REQUIRE';
+export const HANDLE_CORRECT = 'HANDLE_CORRECT';
 
 // ACTIONS CREATORS
 export const addEmail = (email) => ({
@@ -17,6 +18,11 @@ export const sucessRequire = (request) => ({
 export const failureRequire = (error) => ({
   type: FAILURE_REQUIRE,
   error,
+});
+
+export const handleCorrect = (correct) => ({
+  type: HANDLE_CORRECT,
+  correct,
 });
 
 export function fecthIsRequired() {

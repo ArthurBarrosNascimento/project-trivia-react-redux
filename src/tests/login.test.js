@@ -1,6 +1,7 @@
 import React from "react";
-import { screen } from '@testing-library/react';
+import { screen, waitForElementToBeRemoved } from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
+import { history } from "react-router-dom";
 
 import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
 import App from "../App";
@@ -32,10 +33,31 @@ describe('Teste da tela de login', () => {
   it('teste de input para botao habilitado', () => {
     renderWithRouterAndRedux(<App />);
     const inputName = screen.getByTestId('input-player-name');
-    userEvent.type(inputName, 'nome');;
+    userEvent.type(inputName, 'nome');
     const inputEmail = screen.getByTestId('input-gravatar-email');
     userEvent.type(inputEmail, 'email@email.com');
 
     expect(screen.getByTestId('btn-play')).not.toHaveAttribute('disabled')
+  });
+  it('teste de rota para /game', async () => {
+    const { history } = renderWithRouterAndRedux(<App />);
+    const inputName = screen.getByTestId('input-player-name');
+    userEvent.type(inputName, 'nome');
+    const inputEmail = screen.getByTestId('input-gravatar-email');
+    userEvent.type(inputEmail, 'email@email.com');
+    const handleClick = screen.getByTestId('btn-play');
+    userEvent.click(handleClick);
+    
+    await waitForElementToBeRemoved(handleClick, { timeout: 2000 }); //teste de tempo
+  });
+  it('teste do botao configuracao', () => {
+    renderWithRouterAndRedux(<App />);
+    expect(screen.getByTestId('btn-settings')).toBeInTheDocument()
+  });
+  it('teste da rota do botao configuracao', () => {
+    const { history } = renderWithRouterAndRedux(<App />);
+    const handleClick = screen.getByTestId('btn-settings');
+    userEvent.click(handleClick);
+    expect(history.location.pathname).toBe('/configuracoes');
   });
 });

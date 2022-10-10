@@ -42,6 +42,11 @@ class Login extends React.Component {
     history.push('/game');
   };
 
+  handleBtnChange = () => {
+    const { history } = this.props;
+    history.push('/configuracoes');
+  };
+
   guardStore = () => {
     const { token } = this.props;
     localStorage.setItem('token', token);
@@ -73,6 +78,13 @@ class Login extends React.Component {
         >
           Play
         </button>
+        <button
+          data-testid="btn-settings"
+          type="button"
+          onClick={ this.handleBtnChange }
+        >
+          Configurações
+        </button>
       </form>
     );
   }
@@ -80,8 +92,10 @@ class Login extends React.Component {
 
 Login.propTypes = {
   dispatchApi: PropTypes.func.isRequired,
-  history: PropTypes.arrayOf([PropTypes.string]).isRequired,
   token: PropTypes.string.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
 };
 
 const mapStateToProps = (state) => ({

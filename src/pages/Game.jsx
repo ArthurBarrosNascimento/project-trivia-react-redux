@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { requestDataAPI, requestTokenAPI } from '../services/FetchAPI';
+import { requestDataAPI } from '../services/FetchAPI';
 import '../style/Game.css';
+
 
 const CORRECT_ANSWER = 'correct-answer';
 const WRONG_ANSWER = 'wrong-answer';
+const THIRTY_SECONDS = 30;
+const ONE_SECOND = 1000;
 
 export class Game extends Component {
   state = {
@@ -14,6 +17,7 @@ export class Game extends Component {
     indexOfQuestions: 0, // necessary to go through all questions
     isAnswered: false, // when true, the user answered the question.
     isDataLoad: false, // when true, renders the following informations
+    responseTime: THIRTY_SECONDS, // time to answer the question
   };
 
   async componentDidMount() {
@@ -22,8 +26,7 @@ export class Game extends Component {
     } = this.state;
 
     // Simulating token on localStorage. This information is sent by the requirement 5.
-    const token = await requestTokenAPI();
-    localStorage.setItem('token', token);
+    localStorage.getItem('token');
 
     const response = await requestDataAPI(); // 6.2  - Receiving question and answer from the Trivia API.
 
@@ -46,6 +49,7 @@ export class Game extends Component {
       },
       () => this.getAllAnswers(), // runing function
     );
+    this.functimer();
     this.shuffleAllAnswers(allAnswers); // runing function
   }
 
@@ -87,7 +91,27 @@ export class Game extends Component {
       findWrongAnswer[answer].style.border = '3px solid red'; // setting boarder of correct wrong.
     }
   };
+  
+  functimer = () => {
+    this.stopTimer = setInterval(() => this.handleTimer(), ONE_SECOND);
+  };
 
+  handleTimer = () => {
+    const { 
+      responseTime,
+    } = this.state;
+    this.setState(
+      (prevState) => ({
+        responseTime: prevState.responseTime - 1 
+      }),
+      (callback) => { 
+      if (responseTime === 1) {
+        clearInterval(this.stopTimer);
+        this.setState({ isAnswered: true });
+      }
+    });
+  };
+  
   render() {
     const {
       allAnswers, // Use all the possible anserws for the question
@@ -95,12 +119,19 @@ export class Game extends Component {
       indexOfQuestions, // Necessary to go through all questions from data
       isAnswered, // when true, the user answered the question.
       isDataLoad, // when true, renders the following informations
+      responseTime
     } = this.state;
 
     return (
-      <main id="game">
+    <body>
+      {/* <header>
+        <Header />
+      </header> */}
+      <main className="game">
+      
         <div className="info-question">
           <section className="question">
+        <div></div>
             {isDataLoad && (
               <h4 data-testid="question-category">{data[indexOfQuestions].category}</h4> // getting the question category
             )}
@@ -138,7 +169,9 @@ export class Game extends Component {
               ))}
           </section>
         </div>
+        <div className="info-game">{responseTime}</div>
       </main>
+    </body>
     );
   }
 }
@@ -150,4 +183,3 @@ Game.propTypes = {
 };
 
 export default connect()(Game);
-

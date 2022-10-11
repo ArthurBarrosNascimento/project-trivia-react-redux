@@ -7,7 +7,7 @@ import '../style/Game.css';
 const CORRECT_ANSWER = 'correct-answer';
 const WRONG_ANSWER = 'wrong-answer';
 
-export class Game extends Component {
+class Game extends Component {
   state = {
     allAnswers: [], // all the possible anserws for the question
     data: [], // response from requestDataAPI()

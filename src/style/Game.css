@@ -1,0 +1,16 @@
+button {
+  margin: 10px;
+  width: 354px;
+}
+
+.answer-options {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.question {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}

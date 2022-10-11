@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { requestDataAPI, requestTokenAPI } from '../services/FetchAPI';
+import '../style/Game.css';
 
 const CORRECT_ANSWER = 'correct-answer';
 const WRONG_ANSWER = 'wrong-answer';
@@ -10,8 +11,9 @@ export class Game extends Component {
   state = {
     allAnswers: [],
     data: [],
-    isDataLoad: false,
     indexOfQuestions: 0,
+    isDataLoad: false,
+    isResolved: false,
   };
 
   async componentDidMount() {
@@ -71,18 +73,33 @@ export class Game extends Component {
     return AllAnswers;
   };
 
+  isAnswerCorrect = () => {
+    this.setState({
+      isResolved: true,
+    });
+    const correctAnswer = document.getElementsByClassName(CORRECT_ANSWER);
+    correctAnswer[0].style.backgroundColor = 'rgb(51, 208, 51)';
+    correctAnswer[0].style.border = '3px solid rgb(6, 240, 15)';
+    const wrongAnswer = document.getElementsByClassName(WRONG_ANSWER);
+    for (let answer = 0; answer < wrongAnswer.length; answer += 1) {
+      wrongAnswer[answer].style.backgroundColor = 'rgb(235, 81, 81)';
+      wrongAnswer[answer].style.border = '3px solid red';
+    }
+  };
+
   render() {
     const {
       allAnswers, // all the possible anserws for the question
       data, // response from requestDataAPI()
       isDataLoad, // when true, renders the following informations
+      isResolved,
       indexOfQuestions, // necessary to go through all questions from data
     } = this.state;
 
     return (
       <main id="game">
-        <div id="info-question">
-          <section id="question">
+        <div className="info-question">
+          <section className="question">
             {isDataLoad && (
               <h4 data-testid="question-category">{data[indexOfQuestions].category}</h4> // getting the question category
             )}
@@ -90,17 +107,30 @@ export class Game extends Component {
               <h3 data-testid="question-text">{data[indexOfQuestions].question}</h3>// getting the question
             )}
           </section>
-          <section id="answer-options" data-testid="answer-options">
+          <section className="answer-options" data-testid="answer-options">
             {isDataLoad
               && allAnswers.map((item, index) => ( // using .map to go through all answers
                 <button
+                  id="answer"
                   data-testid={
                     item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
                       ? CORRECT_ANSWER // if answer is correct
                       : `${WRONG_ANSWER}-${index}` // if answer is wrong and index
                   }
+                  value={
+                    item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
+                      ? CORRECT_ANSWER // if answer is correct
+                      : `${WRONG_ANSWER}-${index}` // if answer is wrong and index
+                  }
+                  className={
+                    item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
+                      ? CORRECT_ANSWER // if answer is correct
+                      : WRONG_ANSWER // if answer is wrong and index
+                  }
+                  disabled={ isResolved }
                   key={ index }
                   type="button"
+                  onClick={ this.isAnswerCorrect }
                 >
                   {item}
                 </button>

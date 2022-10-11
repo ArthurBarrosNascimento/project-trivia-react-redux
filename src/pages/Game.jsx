@@ -150,3 +150,4 @@ Game.propTypes = {
 };
 
 export default connect()(Game);
+

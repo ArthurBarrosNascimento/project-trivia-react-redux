@@ -1,5 +1,7 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
+import { fecthIsRequired } from '../redux/actions';
 // import PropTypes from 'prop-types';
 
 class Login extends React.Component {
@@ -9,6 +11,11 @@ class Login extends React.Component {
     isBtnDisabled: true,
   };
 
+  // async componentDidMount() {
+  //   const { dispatchApi } = this.props;
+  //   await dispatchApi();
+  // }
+
   handleInput = ({ target }) => {
     const { name, value } = target;
     this.setState({ [name]: value }, () => this.verifyBtn());
@@ -16,7 +23,6 @@ class Login extends React.Component {
 
   isNameValid = (name) => {
     const nameRegex = /^[a-zA-Zà-úÀ-Ú\s]+$/;
-    // const nameRegex = regexp.Compile(`^[a-zA-Zà-úÀ-Ú\s]$`)
     return nameRegex.test(name);
   };
 
@@ -26,22 +32,30 @@ class Login extends React.Component {
     const verifyEmail = Emailregex.test(email); // true
     const verifyName = this.isNameValid(name); // true
     this.setState({ isBtnDisabled: !(verifyEmail && verifyName) }); // false
-    console.log(email, name, verifyEmail, verifyName);
   };
 
-  // handleBtn = (e) => {
-  //   e.preventDefault();
-  //   const { history, dispatch } = this.props; // Foi usado o dispatch para pegar o email, e o history para ao clicar no botao ir para a pagina de carteira
-  //   // const { email } = this.state;
-  //   dispatch(getEmail(email));
-  //   // dispatch(getRequest()); // faz a requisicao ao clicar no botao
-  //   history.push('/carteira');
-  // };
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    const { dispatchApi, history } = this.props;
+    await dispatchApi();
+    this.guardStore();
+    history.push('/game');
+  };
+
+  handleBtnChange = () => {
+    const { history } = this.props;
+    history.push('/configuracoes');
+  };
+
+  guardStore = () => {
+    const { token } = this.props;
+    localStorage.setItem('token', token);
+  };
 
   render() {
     const { isBtnDisabled } = this.state;
     return (
-      <form>
+      <form onSubmit={ this.handleSubmit }>
         <input
           data-testid="input-gravatar-email"
           type="email"
@@ -64,9 +78,32 @@ class Login extends React.Component {
         >
           Play
         </button>
+        <button
+          data-testid="btn-settings"
+          type="button"
+          onClick={ this.handleBtnChange }
+        >
+          Configurações
+        </button>
       </form>
     );
   }
 }
 
-export default connect()(Login);
+Login.propTypes = {
+  dispatchApi: PropTypes.func.isRequired,
+  token: PropTypes.string.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  token: state.exampleReducer.token,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  dispatchApi: () => dispatch(fecthIsRequired()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

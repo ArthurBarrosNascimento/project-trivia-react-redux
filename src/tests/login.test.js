@@ -3,7 +3,7 @@ import { screen, waitForElementToBeRemoved } from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
 import { history } from "react-router-dom";
 
-import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
+import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux'
 import App from "../App";
 
 describe('Teste da tela de login', () => {

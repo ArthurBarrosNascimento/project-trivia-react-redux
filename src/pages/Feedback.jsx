@@ -22,7 +22,7 @@ class Feedback extends Component {
         Feedback
         <div>
           { quase ? (
-            <p>Well DOne!</p>
+            <p>Well Done!</p>
           ) : (
             <p>Could be better...</p>
           )}

@@ -9,11 +9,11 @@ const WRONG_ANSWER = 'wrong-answer';
 
 export class Game extends Component {
   state = {
-    allAnswers: [],
-    data: [],
-    indexOfQuestions: 0,
-    isDataLoad: false,
-    isResolved: false,
+    allAnswers: [], // all the possible anserws for the question
+    data: [], // response from requestDataAPI()
+    indexOfQuestions: 0, // necessary to go through all questions
+    isAnswered: false, // when true, the user answered the question.
+    isDataLoad: false, // when true, renders the following informations
   };
 
   async componentDidMount() {
@@ -25,15 +25,15 @@ export class Game extends Component {
     const token = await requestTokenAPI();
     localStorage.setItem('token', token);
 
-    const response = await requestDataAPI(); // 6.2  - Receiving question and answer alternatives from the Trivia API.
+    const response = await requestDataAPI(); // 6.2  - Receiving question and answer from the Trivia API.
 
-    if (response.length === 0) { // 6.1 - If you don't have questions your token is invalid.
+    if (response.length === 0) { // 6.1 - Verifying if we have questions, If we don't token is invalid.
       const {
-        history,
+        history, // Accessing history from props.
       } = this.props;
 
-      localStorage.removeItem('token');
-      history.push('/');
+      localStorage.removeItem('token'); // Removing Token from localStorage.
+      history.push('/'); // Redirecting to Login page
     }
 
     // When isDataLoad to true, it will run functions getAllAnswers() anda suffleAnswers() from AllAnswers.
@@ -41,28 +41,28 @@ export class Game extends Component {
 
     this.setState(
       {
-        data: response,
-        isDataLoad: true,
+        data: response, // Saving requested data from the response of the requestDataAPI().
+        isDataLoad: true, // Using a conditional to run the functions.
       },
-      () => this.getAllAnswers(),
+      () => this.getAllAnswers(), // runing function
     );
-    this.shuffleAllAnswers(allAnswers);
+    this.shuffleAllAnswers(allAnswers); // runing function
   }
 
-  // Getting all answers (correct/incorrect), combining in const allAnswers and setting on STATE.
+  // Getting all answers (correct/incorrect), combining in a array and saving on STATE.
   // Index is a helper to find the answers from the same question.
 
   getAllAnswers = () => {
     const {
-      data,
-      indexOfQuestions,
+      data, // Accessing data from STATE.
+      indexOfQuestions, // Accessing index of questions from STATE.
     } = this.state;
 
-    const allAnswers = [
-      data[indexOfQuestions].correct_answer,
-      ...data[indexOfQuestions].incorrect_answers,
+    const allAnswers = [ // Heare we are combinnig the correct and wrond answers.
+      data[indexOfQuestions].correct_answer, // Getting correct answer.
+      ...data[indexOfQuestions].incorrect_answers, // Getting wrong answer. Note that we are using spread operator ... to get all the incorrect answers.
     ];
-    this.setState({ allAnswers: this.shuffleAllAnswers(allAnswers) });
+    this.setState({ allAnswers: this.shuffleAllAnswers(allAnswers) }); // Saving  all the answers on STATE.
   };
 
   shuffleAllAnswers = (AllAnswers) => { // Shuffling all answers.
@@ -75,25 +75,26 @@ export class Game extends Component {
 
   isAnswerCorrect = () => {
     this.setState({
-      isResolved: true,
+      isAnswered: true, // when true, start the function
     });
-    const correctAnswer = document.getElementsByClassName(CORRECT_ANSWER);
-    correctAnswer[0].style.backgroundColor = 'rgb(51, 208, 51)';
-    correctAnswer[0].style.border = '3px solid rgb(6, 240, 15)';
-    const wrongAnswer = document.getElementsByClassName(WRONG_ANSWER);
-    for (let answer = 0; answer < wrongAnswer.length; answer += 1) {
-      wrongAnswer[answer].style.backgroundColor = 'rgb(235, 81, 81)';
-      wrongAnswer[answer].style.border = '3px solid red';
+    const findCorrecttAnswer = document.getElementsByClassName(CORRECT_ANSWER); // Find the element of correct answer. It's necessary to set element.
+    findCorrecttAnswer[0].style.backgroundColor = 'rgb(51, 208, 51)'; // setting backgroundColorget of correct answer.
+    findCorrecttAnswer[0].style.border = '3px solid rgb(6, 240, 15)';// setting boarder of correct answer.
+
+    const findWrongAnswer = document.getElementsByClassName(WRONG_ANSWER); // Find the element of wrong answer. It's necessary to set element.
+    for (let answer = 0; answer < findWrongAnswer.length; answer += 1) { // Create a loop to set all the wrong answers.
+      findWrongAnswer[answer].style.backgroundColor = 'rgb(235, 81, 81)'; // setting backgroundColorget of correct wrong.
+      findWrongAnswer[answer].style.border = '3px solid red'; // setting boarder of correct wrong.
     }
   };
 
   render() {
     const {
-      allAnswers, // all the possible anserws for the question
-      data, // response from requestDataAPI()
+      allAnswers, // Use all the possible anserws for the question
+      data, // Get response from requestDataAPI()
+      indexOfQuestions, // Necessary to go through all questions from data
+      isAnswered, // when true, the user answered the question.
       isDataLoad, // when true, renders the following informations
-      isResolved,
-      indexOfQuestions, // necessary to go through all questions from data
     } = this.state;
 
     return (
@@ -127,10 +128,10 @@ export class Game extends Component {
                       ? CORRECT_ANSWER // if answer is correct
                       : WRONG_ANSWER // if answer is wrong and index
                   }
-                  disabled={ isResolved }
+                  disabled={ isAnswered } // Setting isAnswered to false. Use to check if the user answered the question.
                   key={ index }
                   type="button"
-                  onClick={ this.isAnswerCorrect }
+                  onClick={ this.isAnswerCorrect } // when button clicked run the function.
                 >
                   {item}
                 </button>

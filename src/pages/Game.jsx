@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { requestDataAPI, requestTokenAPI } from '../services/FetchAPI';
+import Header from '../components/Header';
 import '../style/Game.css';
 
 const CORRECT_ANSWER = 'correct-answer';
@@ -98,18 +99,23 @@ export class Game extends Component {
     } = this.state;
 
     return (
-      <main id="game">
-        <div className="info-question">
-          <section className="question">
-            {isDataLoad && (
-              <h4 data-testid="question-category">{data[indexOfQuestions].category}</h4> // getting the question category
-            )}
-            {isDataLoad && (
-              <h3 data-testid="question-text">{data[indexOfQuestions].question}</h3>// getting the question
-            )}
-          </section>
-          <section className="answer-options" data-testid="answer-options">
-            {isDataLoad
+      <div>
+        <header>
+          <Header />
+        </header>
+
+        <main id="game">
+          <div className="info-question">
+            <section className="question">
+              {isDataLoad && (
+                <h4 data-testid="question-category">{data[indexOfQuestions].category}</h4> // getting the question category
+              )}
+              {isDataLoad && (
+                <h3 data-testid="question-text">{data[indexOfQuestions].question}</h3>// getting the question
+              )}
+            </section>
+            <section className="answer-options" data-testid="answer-options">
+              {isDataLoad
               && allAnswers.map((item, index) => ( // using .map to go through all answers
                 <button
                   id="answer"
@@ -136,9 +142,10 @@ export class Game extends Component {
                   {item}
                 </button>
               ))}
-          </section>
-        </div>
-      </main>
+            </section>
+          </div>
+        </main>
+      </div>
     );
   }
 }
@@ -150,4 +157,3 @@ Game.propTypes = {
 };
 
 export default connect()(Game);
-

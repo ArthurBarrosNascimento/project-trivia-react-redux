@@ -17,7 +17,7 @@ export class Game extends Component {
     indexOfQuestions: 0, // necessary to go through all questions
     isAnswered: false, // when true, the user answered the question.
     isDataLoad: false, // when true, renders the following informations
-    responseTime: THIRTY_SECONDS, // time to answer the question
+    time: THIRTY_SECONDS, // time to answer the question
   };
 
   async componentDidMount() {
@@ -47,10 +47,11 @@ export class Game extends Component {
         data: response, // Saving requested data from the response of the requestDataAPI().
         isDataLoad: true, // Using a conditional to run the functions.
       },
-      () => this.getAllAnswers(), // runing function
+      (callback) => this.getAllAnswers(), // runing function
     );
-    this.functimer();
     this.shuffleAllAnswers(allAnswers); // runing function
+     // ***********************************************************************************
+     this.timer();
   }
 
   // Getting all answers (correct/incorrect), combining in a array and saving on STATE.
@@ -92,26 +93,92 @@ export class Game extends Component {
     }
   };
   
-  functimer = () => {
-    this.stopTimer = setInterval(() => this.handleTimer(), ONE_SECOND);
-  };
+  // // setInterval = BackUp
 
-  handleTimer = () => {
-    const { 
-      responseTime,
-    } = this.state;
+  // timer = () => {
+  //   this.stopTimer = setInterval(() => this.handleTimer(), ONE_SECOND); // ******************************* i don't know why this.stopTimer ??? Why can i just use setInterval(() => this.handleTimer(), ONE_SECOND);
+  // };
+
+  // handleTimer = () => {
+  //   const { 
+  //     responseTime,
+  //   } = this.state;
+  //   this.setState(
+  //     (prevState) => ({
+  //       responseTime: prevState.responseTime - 1 
+  //     }),
+  //     (callback) => { 
+  //     if (responseTime === 1) {
+  //       clearInterval(this.stopTimer); // *******************************  Why can't I? Just set this.setInterval(() => this.handleTimer(), ONE_SECOND);
+  //       this.setState({ isAnswered: true });
+  //     }
+  //   });
+  // };
+  // }
+
+    // setTimeOut
+    
+  // timer = () => {
+  //   setTimeout(
+  //     handleTimer = () => {
+  //       const { 
+  //         time,
+  //       } = this.state;
+  //       this.setState(
+  //         (prevState) => ({
+  //           time: prevState.time - 1 
+  //         }),
+  //       ) 
+  //     }, 2000
+  //   )
+  // }
+
+    // horaAtual() {
+      
+    //   const {
+    //     time,
+    //   } = this.state;
+    //   console.log(time);
+    //   setTimeout(function () {
+    //     this.setState(
+    //       (prevState) => ({
+    //         time: prevState.time - 1
+    //       })
+    //     ),
+    //     console.log('funciona')
+    //     }, 2000
+    //   )
+    // }
+    
+  // setTimeout 
+  // setInterval`
+
+  timer = () => setInterval(() => this.timeOut(), ONE_SECOND);
+
+  clearInterval(this.timer(), 3000);
+
+  timeOut = () => {
     this.setState(
       (prevState) => ({
-        responseTime: prevState.responseTime - 1 
-      }),
-      (callback) => { 
-      if (responseTime === 1) {
-        clearInterval(this.stopTimer);
-        this.setState({ isAnswered: true });
-      }
-    });
-  };
-  
+        time: prevState.time - 1 
+      }),(callback) => {
+        const { 
+          time,
+        } = this.state;
+        if (time === 28) {
+          this.setState({ 
+            isAnswered: true,
+          });
+          const { 
+            isAnswered,
+          } = this.state;
+          console.log(isAnswered);
+          console.log('para state')
+        }
+      })
+    }
+
+    
   render() {
     const {
       allAnswers, // Use all the possible anserws for the question
@@ -119,11 +186,11 @@ export class Game extends Component {
       indexOfQuestions, // Necessary to go through all questions from data
       isAnswered, // when true, the user answered the question.
       isDataLoad, // when true, renders the following informations
-      responseTime
+      time,
     } = this.state;
 
     return (
-    <body>
+    <div>
       {/* <header>
         <Header />
       </header> */}
@@ -169,9 +236,9 @@ export class Game extends Component {
               ))}
           </section>
         </div>
-        <div className="info-game">{responseTime}</div>
+        <div className="info-game">{time}</div>
       </main>
-    </body>
+    </div>
     );
   }
 }

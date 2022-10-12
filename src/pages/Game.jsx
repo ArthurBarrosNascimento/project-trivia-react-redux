@@ -7,7 +7,6 @@ import '../style/Game.css';
 const CORRECT_ANSWER = 'correct-answer';
 const WRONG_ANSWER = 'wrong-answer';
 const THIRTY_SECONDS = 30;
-const TEST_FIVE_SCOENDS = 5;
 const ONE_SECOND = 1000;
 
 export class Game extends Component {
@@ -49,22 +48,10 @@ export class Game extends Component {
         data: response, // Saving requested data from the response of the requestDataAPI().
         isDataLoad: true, // Using a conditional to run the functions.
       },
-      (callback) => this.getAllAnswers(), // runing function
+      () => this.getAllAnswers(), // runing function
     );
     this.shuffleAllAnswers(allAnswers); // runing function
-    // this.handleCountDownSetTimeout(); // funciona somente 1 vez
-    // this.handleCountDownSetInterval2(); // funciona mas não consigo parar o cronometro.
-    this.handleCountDownSetInterval1(); // funciona mas não consigo parar o cronometro.
-  }
-
-  componentDidUpdate() {
-    // this.handleCountDownSetTimeout(); // não funciona - roda duplicado
-    // this.handleCountDownSetInterval(); // não funciona - roda duplicado
-  }
-
-  componentWillUnmount() {
-    // this.handleCountDownSetTimeout(); // não funciona - roda duplicado
-    // this.handleCountDownSetInterval(); // não funciona - roda duplicado
+    this.timer(); // funciona mas não consigo parar o cronometro.
   }
 
   // ************************** FUNCTIONS
@@ -112,212 +99,26 @@ export class Game extends Component {
     }
   };
 
-  handleCountDownSetTimeout = () => {
-    // function that makes the regressive countdown.
-    const {
-      time, // time to answer the question
-    } = this.state;
+  // fazer os comentários
 
-    const timer = time > 0
-      && setTimeout(() => {
-        // function that makes the regressive countdown.
-        console.log('counting');
-        this.setState((prevState) => ({
-          time: prevState.time - 1, // whe set a STATE call time to manipulate the countdown.
-        }));
-      }, 1000);
-    return () => clearInterval(timer);
-  };
-
-  handleCountDownSetInterval2 = () => {
+  timer = () => setInterval(() => {
     const { time } = this.state;
-    console.log('be for if');
-    console.log(time);
-    if (time > 0) {
-      setInterval(() => {
-        this.setState((prevState) => ({
-          time: prevState.time - 1,
-        }));
-        console.log('in for if');
-        console.log(time);
-      }, ONE_SECOND);
-      console.log('after for if');
-      console.log(time);
-    }
-    if (time === 28) {
-      console.log('a for if');
-      console.log(time);
-      this.setState({ isAnswered: true });
-    }
-    console.log('fora do setState for if');
-  };
+    const timer = time > 0
+        && this.setState(
+          (prevState) => ({
+            time: prevState.time - 1,
+          }),
 
-  handleCountDownSetInterval1 = () => {
-    setInterval(() => this.handleTimer(), ONE_SECOND); // ******************************* i don't know why this.stopTimer ??? Why can i just use setInterval(() => this.handleTimer(), ONE_SECOND);
-  };
-
-  handleTimer = () => {
-    const {
-      time,
-    } = this.state;
-    time > 0
-    && this.setState(
-
-      (prevState) => ({
-        time: prevState.time - 1,
-      }),
-
-      (callback) => {
-        if (time === 1) {
-          this.setState({
-            isAnswered: true,
-            time: 0,
-          });
-        }
-      },
-
-    );
-  };
-
-  //   handleCountDownSetInterval1 = () => {
-  //     setInterval(() => this.handleTimer(), ONE_SECOND); // ******************************* i don't know why this.stopTimer ??? Why can i just use setInterval(() => this.handleTimer(), ONE_SECOND);
-  // };
-
-  // handleTimer = () => {
-  //   const {
-  //     time,
-  //   } = this.state;
-
-  //   this.setState(
-
-  //     (prevState) => ({
-  //       time: prevState.time - 1
-  //     }),
-
-  //     (callback) => {
-  //       if (time === 28) {
-  //         this.setState({ isAnswered: true });
-  //       }
-  //     }
-
-  //   );
-
-  // // BackUp
-  // {
-  // // timer = () => {
-  //   //   this.stopTimer = setInterval(() => this.handleTimer(), ONE_SECOND); // ******************************* i don't know why this.stopTimer ??? Why can i just use setInterval(() => this.handleTimer(), ONE_SECOND);
-  // // };
-
-  // // handleTimer = () => {
-  //   //   const {
-  //     //     time,
-  //     //   } = this.state;
-  //     //   this.setState(
-  //       //     (prevState) => ({
-  //         //       time: prevState.time - 1
-  //         //     }),
-  //         //     (callback) => {
-  //           //     if (time === 1) {
-  // //       clearInterval(this.stopTimer); // *******************************  Why can't I? Just set this.setInterval(() => this.handleTimer(), ONE_SECOND);
-  // //       this.setState({ isAnswered: true });
-  // //     }
-  // //   });
-  // // };
-  // // }
-
-  // }
-
-  // setTimeOut
-
-  // timer = () => {
-  //   setTimeout(
-  //     handleTimer = () => {
-  //       const {
-  //         time,
-  //       } = this.state;
-  //       this.setState(
-  //         (prevState) => ({
-  //           time: prevState.time - 1
-  //         }),
-  //       )
-  //     }, 2000
-  //   )
-  // }
-
-  // horaAtual() {
-
-  //   const {
-  //     time,
-  //   } = this.state;
-  //   console.log(time);
-  //   setTimeout(function () {
-  //     this.setState(
-  //       (prevState) => ({
-  //         time: prevState.time - 1
-  //       })
-  //     ),
-  //     console.log('funciona')
-  //     }, 2000
-  //   )
-  // }
-
-  // setTimeout
-  // setInterval`
-
-  // timer = () => setInterval(() => this.timeOut(), ONE_SECOND);
-
-  // clearInterval(this.timer(), 3000);
-
-  // (callback) => {
-  //         const {
-  //           time,
-  //         } = this.state;
-  //         if (time === 28) {
-  //           this.setState({
-  //             isAnswered: true,
-  //           });
-  //           const {
-  //             isAnswered,
-  //           } = this.state;
-  //           console.log(isAnswered);
-  //           console.log('para state')
-  //         }
-  //       })
-  //     }
-
-  // function delayedMessage() {
-  //   setOutput('');
-  //   timeoutID = setTimeout(setOutput, 2*1000, 'That was really slow!');
-
-  //   },
-  //     function stopTimeOut() { // function that will we cancell
-  //       clearTimeout(timeoutID); // setting witch function
-
-  //   timeOut = () => {
-  //     this.setState(
-  //       (prevState) => ({
-  //         time: prevState.time - 1
-  //       }),(callback) => {
-  //         const {
-  //           time,
-  //         } = this.state;
-  //         if (time === 28) {
-  //           this.setState({
-  //             isAnswered: true,
-  //           });
-  //           const {
-  //             isAnswered,
-  //           } = this.state;
-  //           console.log(isAnswered);
-  //           console.log('para state')
-  //         }
-  //       })
-  //     }
-
-  //   },
-  //     function stopTimeOut() { // function that will we cancell
-  //       clearTimeout(timeoutID); // setting witch function
-  //     }
+          () => {
+            if (time === 1) {
+              this.setState({
+                isAnswered: true,
+                time: 0,
+              });
+            }
+          },
+        );
+  }, ONE_SECOND);
 
   render() {
     const {
@@ -383,6 +184,18 @@ export class Game extends Component {
                   ),
                 )}
             </section>
+          </div>
+          {/* Fazer comentários */}
+          <div className="button">
+            {isAnswered && (
+              <button
+                data-testid="btn-next"
+                type="button"
+                className="next_button"
+              >
+                Next
+              </button>
+            )}
           </div>
           <div className="info-game">{time}</div>
         </main>

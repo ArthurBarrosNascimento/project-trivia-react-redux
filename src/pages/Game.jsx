@@ -4,10 +4,10 @@ import { connect } from 'react-redux';
 import { requestDataAPI } from '../services/FetchAPI';
 import '../style/Game.css';
 
-
 const CORRECT_ANSWER = 'correct-answer';
 const WRONG_ANSWER = 'wrong-answer';
 const THIRTY_SECONDS = 30;
+const TEST_FIVE_SCOENDS = 5;
 const ONE_SECOND = 1000;
 
 export class Game extends Component {
@@ -17,6 +17,7 @@ export class Game extends Component {
     indexOfQuestions: 0, // necessary to go through all questions
     isAnswered: false, // when true, the user answered the question.
     isDataLoad: false, // when true, renders the following informations
+    // enableAnswers // será que utilizo para bloquear as opções?
     time: THIRTY_SECONDS, // time to answer the question
   };
 
@@ -30,7 +31,8 @@ export class Game extends Component {
 
     const response = await requestDataAPI(); // 6.2  - Receiving question and answer from the Trivia API.
 
-    if (response.length === 0) { // 6.1 - Verifying if we have questions, If we don't token is invalid.
+    if (response.length === 0) {
+      // 6.1 - Verifying if we have questions, If we don't token is invalid.
       const {
         history, // Accessing history from props.
       } = this.props;
@@ -50,9 +52,22 @@ export class Game extends Component {
       (callback) => this.getAllAnswers(), // runing function
     );
     this.shuffleAllAnswers(allAnswers); // runing function
-     // ***********************************************************************************
-     this.timer();
+    // this.handleCountDownSetTimeout(); // funciona somente 1 vez
+    // this.handleCountDownSetInterval2(); // funciona mas não consigo parar o cronometro.
+    this.handleCountDownSetInterval1(); // funciona mas não consigo parar o cronometro.
   }
+
+  componentDidUpdate() {
+    // this.handleCountDownSetTimeout(); // não funciona - roda duplicado
+    // this.handleCountDownSetInterval(); // não funciona - roda duplicado
+  }
+
+  componentWillUnmount() {
+    // this.handleCountDownSetTimeout(); // não funciona - roda duplicado
+    // this.handleCountDownSetInterval(); // não funciona - roda duplicado
+  }
+
+  // ************************** FUNCTIONS
 
   // Getting all answers (correct/incorrect), combining in a array and saving on STATE.
   // Index is a helper to find the answers from the same question.
@@ -63,15 +78,18 @@ export class Game extends Component {
       indexOfQuestions, // Accessing index of questions from STATE.
     } = this.state;
 
-    const allAnswers = [ // Heare we are combinnig the correct and wrond answers.
+    const allAnswers = [
+      // Heare we are combinnig the correct and wrond answers.
       data[indexOfQuestions].correct_answer, // Getting correct answer.
       ...data[indexOfQuestions].incorrect_answers, // Getting wrong answer. Note that we are using spread operator ... to get all the incorrect answers.
     ];
     this.setState({ allAnswers: this.shuffleAllAnswers(allAnswers) }); // Saving  all the answers on STATE.
   };
 
-  shuffleAllAnswers = (AllAnswers) => { // Shuffling all answers.
-    for (let i = AllAnswers.length - 1; i > 0; i -= 1) { // Choosing random element
+  shuffleAllAnswers = (AllAnswers) => {
+    // Shuffling all answers.
+    for (let i = AllAnswers.length - 1; i > 0; i -= 1) {
+      // Choosing random element
       const j = Math.floor(Math.random() * (i + 1));
       [AllAnswers[i], AllAnswers[j]] = [AllAnswers[j], AllAnswers[i]]; // Repositioning element
     }
@@ -84,101 +102,223 @@ export class Game extends Component {
     });
     const findCorrecttAnswer = document.getElementsByClassName(CORRECT_ANSWER); // Find the element of correct answer. It's necessary to set element.
     findCorrecttAnswer[0].style.backgroundColor = 'rgb(51, 208, 51)'; // setting backgroundColorget of correct answer.
-    findCorrecttAnswer[0].style.border = '3px solid rgb(6, 240, 15)';// setting boarder of correct answer.
+    findCorrecttAnswer[0].style.border = '3px solid rgb(6, 240, 15)'; // setting boarder of correct answer.
 
     const findWrongAnswer = document.getElementsByClassName(WRONG_ANSWER); // Find the element of wrong answer. It's necessary to set element.
-    for (let answer = 0; answer < findWrongAnswer.length; answer += 1) { // Create a loop to set all the wrong answers.
+    for (let answer = 0; answer < findWrongAnswer.length; answer += 1) {
+      // Create a loop to set all the wrong answers.
       findWrongAnswer[answer].style.backgroundColor = 'rgb(235, 81, 81)'; // setting backgroundColorget of correct wrong.
       findWrongAnswer[answer].style.border = '3px solid red'; // setting boarder of correct wrong.
     }
   };
-  
-  // // setInterval = BackUp
 
-  // timer = () => {
-  //   this.stopTimer = setInterval(() => this.handleTimer(), ONE_SECOND); // ******************************* i don't know why this.stopTimer ??? Why can i just use setInterval(() => this.handleTimer(), ONE_SECOND);
+  handleCountDownSetTimeout = () => {
+    // function that makes the regressive countdown.
+    const {
+      time, // time to answer the question
+    } = this.state;
+
+    const timer = time > 0
+      && setTimeout(() => {
+        // function that makes the regressive countdown.
+        console.log('counting');
+        this.setState((prevState) => ({
+          time: prevState.time - 1, // whe set a STATE call time to manipulate the countdown.
+        }));
+      }, 1000);
+    return () => clearInterval(timer);
+  };
+
+  handleCountDownSetInterval2 = () => {
+    const { time } = this.state;
+    console.log('be for if');
+    console.log(time);
+    if (time > 0) {
+      setInterval(() => {
+        this.setState((prevState) => ({
+          time: prevState.time - 1,
+        }));
+        console.log('in for if');
+        console.log(time);
+      }, ONE_SECOND);
+      console.log('after for if');
+      console.log(time);
+    }
+    if (time === 28) {
+      console.log('a for if');
+      console.log(time);
+      this.setState({ isAnswered: true });
+    }
+    console.log('fora do setState for if');
+  };
+
+  handleCountDownSetInterval1 = () => {
+    setInterval(() => this.handleTimer(), ONE_SECOND); // ******************************* i don't know why this.stopTimer ??? Why can i just use setInterval(() => this.handleTimer(), ONE_SECOND);
+  };
+
+  handleTimer = () => {
+    const {
+      time,
+    } = this.state;
+    time > 0
+    && this.setState(
+
+      (prevState) => ({
+        time: prevState.time - 1,
+      }),
+
+      (callback) => {
+        if (time === 1) {
+          this.setState({
+            isAnswered: true,
+            time: 0,
+          });
+        }
+      },
+
+    );
+  };
+
+  //   handleCountDownSetInterval1 = () => {
+  //     setInterval(() => this.handleTimer(), ONE_SECOND); // ******************************* i don't know why this.stopTimer ??? Why can i just use setInterval(() => this.handleTimer(), ONE_SECOND);
   // };
 
   // handleTimer = () => {
-  //   const { 
-  //     responseTime,
+  //   const {
+  //     time,
   //   } = this.state;
+
   //   this.setState(
+
   //     (prevState) => ({
-  //       responseTime: prevState.responseTime - 1 
+  //       time: prevState.time - 1
   //     }),
-  //     (callback) => { 
-  //     if (responseTime === 1) {
-  //       clearInterval(this.stopTimer); // *******************************  Why can't I? Just set this.setInterval(() => this.handleTimer(), ONE_SECOND);
-  //       this.setState({ isAnswered: true });
+
+  //     (callback) => {
+  //       if (time === 28) {
+  //         this.setState({ isAnswered: true });
+  //       }
   //     }
-  //   });
-  // };
+
+  //   );
+
+  // // BackUp
+  // {
+  // // timer = () => {
+  //   //   this.stopTimer = setInterval(() => this.handleTimer(), ONE_SECOND); // ******************************* i don't know why this.stopTimer ??? Why can i just use setInterval(() => this.handleTimer(), ONE_SECOND);
+  // // };
+
+  // // handleTimer = () => {
+  //   //   const {
+  //     //     time,
+  //     //   } = this.state;
+  //     //   this.setState(
+  //       //     (prevState) => ({
+  //         //       time: prevState.time - 1
+  //         //     }),
+  //         //     (callback) => {
+  //           //     if (time === 1) {
+  // //       clearInterval(this.stopTimer); // *******************************  Why can't I? Just set this.setInterval(() => this.handleTimer(), ONE_SECOND);
+  // //       this.setState({ isAnswered: true });
+  // //     }
+  // //   });
+  // // };
+  // // }
+
   // }
 
-    // setTimeOut
-    
+  // setTimeOut
+
   // timer = () => {
   //   setTimeout(
   //     handleTimer = () => {
-  //       const { 
+  //       const {
   //         time,
   //       } = this.state;
   //       this.setState(
   //         (prevState) => ({
-  //           time: prevState.time - 1 
+  //           time: prevState.time - 1
   //         }),
-  //       ) 
+  //       )
   //     }, 2000
   //   )
   // }
 
-    // horaAtual() {
-      
-    //   const {
-    //     time,
-    //   } = this.state;
-    //   console.log(time);
-    //   setTimeout(function () {
-    //     this.setState(
-    //       (prevState) => ({
-    //         time: prevState.time - 1
-    //       })
-    //     ),
-    //     console.log('funciona')
-    //     }, 2000
-    //   )
-    // }
-    
-  // setTimeout 
+  // horaAtual() {
+
+  //   const {
+  //     time,
+  //   } = this.state;
+  //   console.log(time);
+  //   setTimeout(function () {
+  //     this.setState(
+  //       (prevState) => ({
+  //         time: prevState.time - 1
+  //       })
+  //     ),
+  //     console.log('funciona')
+  //     }, 2000
+  //   )
+  // }
+
+  // setTimeout
   // setInterval`
 
-  timer = () => setInterval(() => this.timeOut(), ONE_SECOND);
+  // timer = () => setInterval(() => this.timeOut(), ONE_SECOND);
 
-  clearInterval(this.timer(), 3000);
+  // clearInterval(this.timer(), 3000);
 
-  timeOut = () => {
-    this.setState(
-      (prevState) => ({
-        time: prevState.time - 1 
-      }),(callback) => {
-        const { 
-          time,
-        } = this.state;
-        if (time === 28) {
-          this.setState({ 
-            isAnswered: true,
-          });
-          const { 
-            isAnswered,
-          } = this.state;
-          console.log(isAnswered);
-          console.log('para state')
-        }
-      })
-    }
+  // (callback) => {
+  //         const {
+  //           time,
+  //         } = this.state;
+  //         if (time === 28) {
+  //           this.setState({
+  //             isAnswered: true,
+  //           });
+  //           const {
+  //             isAnswered,
+  //           } = this.state;
+  //           console.log(isAnswered);
+  //           console.log('para state')
+  //         }
+  //       })
+  //     }
 
-    
+  // function delayedMessage() {
+  //   setOutput('');
+  //   timeoutID = setTimeout(setOutput, 2*1000, 'That was really slow!');
+
+  //   },
+  //     function stopTimeOut() { // function that will we cancell
+  //       clearTimeout(timeoutID); // setting witch function
+
+  //   timeOut = () => {
+  //     this.setState(
+  //       (prevState) => ({
+  //         time: prevState.time - 1
+  //       }),(callback) => {
+  //         const {
+  //           time,
+  //         } = this.state;
+  //         if (time === 28) {
+  //           this.setState({
+  //             isAnswered: true,
+  //           });
+  //           const {
+  //             isAnswered,
+  //           } = this.state;
+  //           console.log(isAnswered);
+  //           console.log('para state')
+  //         }
+  //       })
+  //     }
+
+  //   },
+  //     function stopTimeOut() { // function that will we cancell
+  //       clearTimeout(timeoutID); // setting witch function
+  //     }
+
   render() {
     const {
       allAnswers, // Use all the possible anserws for the question
@@ -190,55 +330,63 @@ export class Game extends Component {
     } = this.state;
 
     return (
-    <div>
-      {/* <header>
+      <div>
+        {/* <header>
         <Header />
       </header> */}
-      <main className="game">
-      
-        <div className="info-question">
-          <section className="question">
-        <div></div>
-            {isDataLoad && (
-              <h4 data-testid="question-category">{data[indexOfQuestions].category}</h4> // getting the question category
-            )}
-            {isDataLoad && (
-              <h3 data-testid="question-text">{data[indexOfQuestions].question}</h3>// getting the question
-            )}
-          </section>
-          <section className="answer-options" data-testid="answer-options">
-            {isDataLoad
-              && allAnswers.map((item, index) => ( // using .map to go through all answers
-                <button
-                  id="answer"
-                  data-testid={
-                    item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
-                      ? CORRECT_ANSWER // if answer is correct
-                      : `${WRONG_ANSWER}-${index}` // if answer is wrong and index
-                  }
-                  value={
-                    item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
-                      ? CORRECT_ANSWER // if answer is correct
-                      : `${WRONG_ANSWER}-${index}` // if answer is wrong and index
-                  }
-                  className={
-                    item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
-                      ? CORRECT_ANSWER // if answer is correct
-                      : WRONG_ANSWER // if answer is wrong and index
-                  }
-                  disabled={ isAnswered } // Setting isAnswered to false. Use to check if the user answered the question.
-                  key={ index }
-                  type="button"
-                  onClick={ this.isAnswerCorrect } // when button clicked run the function.
-                >
-                  {item}
-                </button>
-              ))}
-          </section>
-        </div>
-        <div className="info-game">{time}</div>
-      </main>
-    </div>
+        <main className="game">
+          <div className="info-question">
+            <section className="question">
+              <div />
+              {isDataLoad && (
+                <h4 data-testid="question-category">
+                  {data[indexOfQuestions].category}
+                </h4> // getting the question category
+              )}
+              {isDataLoad && (
+                <h3 data-testid="question-text">
+                  {data[indexOfQuestions].question}
+                </h3> // getting the question
+              )}
+            </section>
+            <section className="answer-options" data-testid="answer-options">
+              {isDataLoad
+                && allAnswers.map(
+                  (
+                    item,
+                    index, // using .map to go through all answers
+                  ) => (
+                    <button
+                      id="answer"
+                      data-testid={
+                        item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
+                          ? CORRECT_ANSWER // if answer is correct
+                          : `${WRONG_ANSWER}-${index}` // if answer is wrong and index
+                      }
+                      value={
+                        item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
+                          ? CORRECT_ANSWER // if answer is correct
+                          : `${WRONG_ANSWER}-${index}` // if answer is wrong and index
+                      }
+                      className={
+                        item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
+                          ? CORRECT_ANSWER // if answer is correct
+                          : WRONG_ANSWER // if answer is wrong and index
+                      }
+                      disabled={ isAnswered } // Setting isAnswered to false. Use to check if the user answered the question.
+                      key={ index }
+                      type="button"
+                      onClick={ this.isAnswerCorrect } // when button clicked run the function.
+                    >
+                      {item}
+                    </button>
+                  ),
+                )}
+            </section>
+          </div>
+          <div className="info-game">{time}</div>
+        </main>
+      </div>
     );
   }
 }

@@ -9,7 +9,7 @@ const WRONG_ANSWER = 'wrong-answer';
 const THIRTY_SECONDS = 30;
 const ONE_SECOND = 1000;
 
-export class Game extends Component {
+class Game extends Component {
   state = {
     allAnswers: [], // all the possible answers for the question
     data: [], // response from requestDataAPI()

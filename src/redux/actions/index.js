@@ -1,16 +1,18 @@
-export const LOG_IN = 'LOG_IN';
+// export const LOG_IN = 'LOG_IN';
 export const REQUEST_SCORE = 'REQUEST_SCORE';
 export const REQUEST_ASSERTIONS = 'REQUEST_ASSERTIONS';
 export const RESET_SCORE = 'RESET_SCORE';
 export const SUCESS_REQUIRE = 'SUCESS_REQUIRE';
 export const FAILURE_REQUIRE = 'FAILURE_REQUIRE';
 export const HANDLE_CORRECT = 'HANDLE_CORRECT';
+export const ACTION_EMAIL = 'ACTION_EMAIL';
+export const ACTION_NAME = 'ACTION_NAME';
 
-const requestLogin = (email, name) => ({
-  type: LOG_IN,
-  gravatarEmail: email,
-  name,
-});
+// const requestLogin = (email, name) => ({
+//   type: LOG_IN,
+//   gravatarEmail: email,
+//   name,
+// });
 
 export const requestScore = (payload) => ({
   type: REQUEST_SCORE,
@@ -25,7 +27,17 @@ export const resetScore = () => ({
   type: RESET_SCORE,
 });
 
-export default requestLogin;
+export const emailAction = (payload) => ({
+  type: ACTION_EMAIL,
+  payload,
+});
+
+export const nameAction = (payload) => ({
+  type: ACTION_NAME,
+  payload,
+});
+
+// export default requestLogin;
 
 export const sucessRequire = (request) => ({
   type: SUCESS_REQUIRE,

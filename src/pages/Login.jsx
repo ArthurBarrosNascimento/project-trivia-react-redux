@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { fecthIsRequired } from '../redux/actions';
+import { fecthIsRequired, emailAction, nameAction } from '../redux/actions';
 // import PropTypes from 'prop-types';
 
 class Login extends React.Component {
@@ -36,10 +36,13 @@ class Login extends React.Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const { dispatchApi, history } = this.props;
+    const { dispatchApi, history, dispatchEmail, dispatchName } = this.props;
+    const { email, name } = this.state;
     await dispatchApi();
     this.guardStore();
     history.push('/game');
+    dispatchEmail(email);
+    dispatchName(name);
   };
 
   handleBtnChange = () => {
@@ -92,6 +95,8 @@ class Login extends React.Component {
 
 Login.propTypes = {
   dispatchApi: PropTypes.func.isRequired,
+  dispatchEmail: PropTypes.func.isRequired,
+  dispatchName: PropTypes.func.isRequired,
   token: PropTypes.string.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func,
@@ -104,6 +109,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   dispatchApi: () => dispatch(fecthIsRequired()),
+  dispatchEmail: (...email) => dispatch(emailAction(...email)),
+  dispatchName: (...name) => dispatch(nameAction(...name)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

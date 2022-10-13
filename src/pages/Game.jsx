@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { requestDataAPI } from '../services/FetchAPI';
 import '../style/Game.css';
+import Header from '../components/Header';
 
 const CORRECT_ANSWER = 'correct-answer';
 const WRONG_ANSWER = 'wrong-answer';
@@ -127,9 +128,9 @@ class Game extends Component {
 
     return (
       <div>
-        {/* <header>
-        <Header />
-      </header> */}
+        <header>
+          <Header />
+        </header>
         <main className="game">
           <div className="info-question">
             <section className="question">

@@ -14,3 +14,10 @@ button {
   display: flex;
   flex-direction: column;
 }
+
+.info-game {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  font-size: 45px;
+}

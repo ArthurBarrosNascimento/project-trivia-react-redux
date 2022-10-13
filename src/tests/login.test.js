@@ -48,7 +48,7 @@ describe('Teste da tela de login', () => {
     const handleClick = screen.getByTestId('btn-play');
     userEvent.click(handleClick);
     
-    await waitForElementToBeRemoved(handleClick, { timeout: 2000 }); //teste de tempo
+    await waitForElementToBeRemoved(handleClick, { timeout: 2000 });
   });
   it('teste do botao configuracao', () => {
     renderWithRouterAndRedux(<App />);

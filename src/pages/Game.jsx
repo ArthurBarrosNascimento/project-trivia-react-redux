@@ -20,8 +20,6 @@ class Game extends Component {
     countdown: THIRTY_SECONDS, // countdown to answer the question
   };
 
-  //Making changes to update main-group branch.
-  
   async componentDidMount() {
     const {
       allAnswers, // Getting all the answers for the question from STATE.

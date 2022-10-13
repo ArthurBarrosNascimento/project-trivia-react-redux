@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import Login from './pages/Login';
 import Configurações from './pages/Configuracoes';
-import { Game } from './pages/Game';
+import Game from './pages/Game';
 
 class App extends React.Component {
   render() {

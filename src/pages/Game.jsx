@@ -11,22 +11,18 @@ const ONE_SECOND = 1000;
 
 export class Game extends Component {
   state = {
-    allAnswers: [], // all the possible anserws for the question
+    allAnswers: [], // all the possible answers for the question
     data: [], // response from requestDataAPI()
     indexOfQuestions: 0, // necessary to go through all questions
     isAnswered: false, // when true, the user answered the question.
-    isDataLoad: false, // when true, renders the following informations
-    // enableAnswers // será que utilizo para bloquear as opções?
-    time: THIRTY_SECONDS, // time to answer the question
+    isDataLoad: false, // when true, renders functions
+    countdown: THIRTY_SECONDS, // countdown to answer the question
   };
 
   async componentDidMount() {
     const {
       allAnswers, // Getting all the answers for the question from STATE.
     } = this.state;
-
-    // Simulating token on localStorage. This information is sent by the requirement 5.
-    localStorage.getItem('token');
 
     const response = await requestDataAPI(); // 6.2  - Receiving question and answer from the Trivia API.
 
@@ -48,16 +44,15 @@ export class Game extends Component {
         data: response, // Saving requested data from the response of the requestDataAPI().
         isDataLoad: true, // Using a conditional to run the functions.
       },
-      () => this.getAllAnswers(), // runing function
+      () => this.getAllAnswers(), // runing function to get all the answers.
     );
-    this.shuffleAllAnswers(allAnswers); // runing function
-    this.timer(); // funciona mas não consigo parar o cronometro.
+    this.shuffleAllAnswers(allAnswers); // runing function using allAnswers.
+    this.timer(); // runing function to start the countdown.
   }
 
-  // ************************** FUNCTIONS
+  // ************************** FUNCTIONS ************************** //
 
-  // Getting all answers (correct/incorrect), combining in a array and saving on STATE.
-  // Index is a helper to find the answers from the same question.
+  // Getting all answers (correct/incorrect), combining in a array and saving on STATE. indexOfQuestions is a helper to find the answers from the same question.
 
   getAllAnswers = () => {
     const {
@@ -65,8 +60,7 @@ export class Game extends Component {
       indexOfQuestions, // Accessing index of questions from STATE.
     } = this.state;
 
-    const allAnswers = [
-      // Heare we are combinnig the correct and wrond answers.
+    const allAnswers = [ // Heare we are combinnig the correct and wrond answers.
       data[indexOfQuestions].correct_answer, // Getting correct answer.
       ...data[indexOfQuestions].incorrect_answers, // Getting wrong answer. Note that we are using spread operator ... to get all the incorrect answers.
     ];
@@ -74,51 +68,52 @@ export class Game extends Component {
   };
 
   shuffleAllAnswers = (AllAnswers) => {
-    // Shuffling all answers.
-    for (let i = AllAnswers.length - 1; i > 0; i -= 1) {
-      // Choosing random element
-      const j = Math.floor(Math.random() * (i + 1));
+    for (let i = AllAnswers.length - 1; i > 0; i -= 1) { // Shuffling all answers.
+      const j = Math.floor(Math.random() * (i + 1)); // Choosing random element
       [AllAnswers[i], AllAnswers[j]] = [AllAnswers[j], AllAnswers[i]]; // Repositioning element
     }
-    return AllAnswers;
+    return AllAnswers; // returning the answers shuffled
   };
 
   isAnswerCorrect = () => {
     this.setState({
       isAnswered: true, // when true, start the function
     });
+
     const findCorrecttAnswer = document.getElementsByClassName(CORRECT_ANSWER); // Find the element of correct answer. It's necessary to set element.
     findCorrecttAnswer[0].style.backgroundColor = 'rgb(51, 208, 51)'; // setting backgroundColorget of correct answer.
     findCorrecttAnswer[0].style.border = '3px solid rgb(6, 240, 15)'; // setting boarder of correct answer.
 
     const findWrongAnswer = document.getElementsByClassName(WRONG_ANSWER); // Find the element of wrong answer. It's necessary to set element.
-    for (let answer = 0; answer < findWrongAnswer.length; answer += 1) {
-      // Create a loop to set all the wrong answers.
+    for (let answer = 0; answer < findWrongAnswer.length; answer += 1) { // Create a loop to set all the wrong answers.
       findWrongAnswer[answer].style.backgroundColor = 'rgb(235, 81, 81)'; // setting backgroundColorget of correct wrong.
       findWrongAnswer[answer].style.border = '3px solid red'; // setting boarder of correct wrong.
     }
   };
 
-  // fazer os comentários
-
   timer = () => setInterval(() => {
-    const { time } = this.state;
-    const timer = time > 0
-        && this.setState(
-          (prevState) => ({
-            time: prevState.time - 1,
-          }),
+    const {
+      countdown, // Accessing countdown from STATE.
+    } = this.state;
 
-          () => {
-            if (time === 1) {
-              this.setState({
-                isAnswered: true,
-                time: 0,
-              });
-            }
-          },
-        );
+    if (countdown > 0) { // If countdown is bigger than 0, start the loop to countdown.
+      this.setState(
+        (prevState) => ({
+          countdown: prevState.countdown - 1, // Loop for the countdown.
+        }),
+        () => {
+          if (countdown === 1) { // If countdown is equal to 1, sets the conditiona isAnswered equals true and the countdown to 0.
+            this.setState({
+              isAnswered: true,
+              countdown: 0,
+            });
+          }
+        },
+      );
+    }
   }, ONE_SECOND);
+
+  // ************************** ---------- ************************** //
 
   render() {
     const {
@@ -127,7 +122,7 @@ export class Game extends Component {
       indexOfQuestions, // Necessary to go through all questions from data
       isAnswered, // when true, the user answered the question.
       isDataLoad, // when true, renders the following informations
-      time,
+      countdown, // countdown to answer the question
     } = this.state;
 
     return (
@@ -152,42 +147,36 @@ export class Game extends Component {
             </section>
             <section className="answer-options" data-testid="answer-options">
               {isDataLoad
-                && allAnswers.map(
-                  (
-                    item,
-                    index, // using .map to go through all answers
-                  ) => (
-                    <button
-                      id="answer"
-                      data-testid={
-                        item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
-                          ? CORRECT_ANSWER // if answer is correct
-                          : `${WRONG_ANSWER}-${index}` // if answer is wrong and index
-                      }
-                      value={
-                        item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
-                          ? CORRECT_ANSWER // if answer is correct
-                          : `${WRONG_ANSWER}-${index}` // if answer is wrong and index
-                      }
-                      className={
-                        item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
-                          ? CORRECT_ANSWER // if answer is correct
-                          : WRONG_ANSWER // if answer is wrong and index
-                      }
-                      disabled={ isAnswered } // Setting isAnswered to false. Use to check if the user answered the question.
-                      key={ index }
-                      type="button"
-                      onClick={ this.isAnswerCorrect } // when button clicked run the function.
-                    >
-                      {item}
-                    </button>
-                  ),
-                )}
+                && allAnswers.map((item, index) => ( // Using .map to go through all answers, to set informations.
+                  <button
+                    id="answer"
+                    data-testid={
+                      item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
+                        ? CORRECT_ANSWER // if answer is correct
+                        : `${WRONG_ANSWER}-${index}` // if answer is wrong and index
+                    }
+                    value={
+                      item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
+                        ? CORRECT_ANSWER // if answer is correct
+                        : `${WRONG_ANSWER}-${index}` // if answer is wrong and index
+                    }
+                    className={
+                      item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
+                        ? CORRECT_ANSWER // if answer is correct
+                        : WRONG_ANSWER // if answer is wrong and index
+                    }
+                    disabled={ isAnswered } // Setting isAnswered to false. Use to check if the user answered the question.
+                    key={ index }
+                    type="button"
+                    onClick={ this.isAnswerCorrect } // when button clicked run the function.
+                  >
+                    {item}
+                  </button>
+                ))}
             </section>
           </div>
-          {/* Fazer comentários */}
           <div className="button">
-            {isAnswered && (
+            {isAnswered && ( // If isAnswered equals true, create the button for the next question.
               <button
                 data-testid="btn-next"
                 type="button"
@@ -197,7 +186,7 @@ export class Game extends Component {
               </button>
             )}
           </div>
-          <div className="info-game">{time}</div>
+          <div className="info-game">{countdown}</div>
         </main>
       </div>
     );

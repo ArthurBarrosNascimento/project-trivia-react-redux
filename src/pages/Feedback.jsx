@@ -39,7 +39,7 @@ class Feedback extends Component {
         </div>
         <p data-testid="correct-answer"> teste </p>
         <p data-testid="feedback-text"> teste </p>
-        <button type="button" data-testid="btn-next"> teste </button> */}
+        <button type="button" data-testid="btn-next"> teste </button>
       </div>
     );
   }

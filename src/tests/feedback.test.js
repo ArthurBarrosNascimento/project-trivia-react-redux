@@ -13,17 +13,17 @@ describe('Teste da Feedback page', () => {
     
   });
    it('teste de click play again',  () => {
-    const { history } = renderWithRouterAndRedux(<App />, {}, '/feedbacks');
+    const { history } = renderWithRouterAndRedux(<App />, {}, '/feedback');
 
-    // expect(screen.getByTestId('btn-play-again')).toBeInTheDocument();
-    userEvent.click(screen.getByTestId('btn-play-again'));
+    expect(screen.getByRole('button', { name: /play again/i })).toBeInTheDocument();
+    userEvent.click(screen.getByRole('button', { name: /play again/i }));
     expect(history.location.pathname).toBe('/');
   })
   it('teste do caminho do ranking',  () => {
-    const { history } = renderWithRouterAndRedux(<App />, {}, '/feedbacks');
+    const { history } = renderWithRouterAndRedux(<App />, {}, '/feedback');
 
-    // expect(screen.getByTestId('btn-play-again')).toBeInTheDocument();
-    userEvent.click(screen.getByTestId('btn-ranking'));
+    expect(screen.getByRole('button', { name: /ranking/i })).toBeInTheDocument();
+    userEvent.click(screen.getByRole('button', { name: /ranking/i }));
     expect(history.location.pathname).toBe('/ranking');
 
   })

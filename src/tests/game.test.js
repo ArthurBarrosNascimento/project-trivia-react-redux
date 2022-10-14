@@ -43,7 +43,7 @@ describe('teste do Game', () => {
     global.fetch = jest.fn().mockResolvedValue({
       json: jest.fn().mockResolvedValue({ response_code: 3 }),
     });
-    renderWithRouterAndRedux(<App />, INIT_STATE, '/login');
+    renderWithRouterAndRedux(<App />, {}, '/game');
 
     const nameInput = await screen.findByTestId('input-player-name');
     expect(nameInput).toBeInTheDocument();
@@ -54,7 +54,7 @@ describe('teste do Game', () => {
     global.fetch = jest.fn().mockResolvedValue({
       json: jest.fn().mockResolvedValue(questionsResponse),
     });
-    const { history } = renderWithRouterAndRedux(<App />, INIT_STATE, '/feedback');
+    const { history } = renderWithRouterAndRedux(<App />, {}, '/game');
 
     userEvent.click(await screen.findByTestId('answer-options'));
   

@@ -15,7 +15,7 @@ class Feedback extends Component {
   render() {
     return (
       <div>
-        Feedback
+        Page Feedback
         <button
           type="button"
           data-testid="btn-play-again"

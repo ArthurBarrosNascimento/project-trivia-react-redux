@@ -53,9 +53,6 @@ class Game extends Component {
     }
   }
 
-  // correct_answer
-  // incorrect_answers
-
   getAllAnswers = () => {
     const { data, indexOfQuestions } = this.state;
     const incorrectAnswers = data[indexOfQuestions]?.incorrect_answers || [];

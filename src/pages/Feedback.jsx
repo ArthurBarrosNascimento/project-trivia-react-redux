@@ -30,6 +30,16 @@ class Feedback extends Component {
         >
           Ranking
         </button>
+        {/* <div>
+          { quase ? (
+            <p>Well Done!</p>
+          ) : (
+            <p>Could be better...</p>
+          )}
+        </div>
+        <p data-testid="correct-answer"> teste </p>
+        <p data-testid="feedback-text"> teste </p>
+        <button type="button" data-testid="btn-next"> teste </button> */}
       </div>
     );
   }

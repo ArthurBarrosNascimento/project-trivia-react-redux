@@ -7,6 +7,8 @@ export const FAILURE_REQUIRE = 'FAILURE_REQUIRE';
 export const HANDLE_CORRECT = 'HANDLE_CORRECT';
 export const ACTION_EMAIL = 'ACTION_EMAIL';
 export const ACTION_NAME = 'ACTION_NAME';
+export const ACTION_ASSERTIONS = 'ACTION_ASSERTIONS';
+export const ACTION_SCORE = 'ACTION_SCORE';
 
 // const requestLogin = (email, name) => ({
 //   type: LOG_IN,
@@ -52,6 +54,16 @@ export const failureRequire = (error) => ({
 export const handleCorrect = (correct) => ({
   type: HANDLE_CORRECT,
   correct,
+});
+
+export const ActionAssertions = (payload) => ({
+  type: ACTION_ASSERTIONS,
+  payload,
+});
+
+export const ActionScore = (payload) => ({
+  type: ACTION_SCORE,
+  payload,
 });
 
 export function fecthIsRequired() {

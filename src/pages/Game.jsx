@@ -1,9 +1,11 @@
+// import { Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { requestDataAPI } from '../services/FetchAPI';
 import '../style/Game.css';
 import Header from '../components/Header';
+import { ActionScore } from '../redux/actions';
 
 const CORRECT_ANSWER = 'correct-answer';
 const WRONG_ANSWER = 'wrong-answer';
@@ -18,52 +20,48 @@ class Game extends Component {
     isAnswered: false, // when true, the user answered the question.
     isDataLoad: false, // when true, renders functions
     countdown: THIRTY_SECONDS, // countdown to answer the question
+    score: 0,
+    assertions: 0,
+    // isRedirect: false,
   };
 
   async componentDidMount() {
-    const {
-      allAnswers, // Getting all the answers for the question from STATE.
-    } = this.state;
-
+    const { allAnswers } = this.state;
     const response = await requestDataAPI(); // 6.2  - Receiving question and answer from the Trivia API.
-
     if (response.length === 0) {
       // 6.1 - Verifying if we have questions, If we don't token is invalid.
-      const {
-        history, // Accessing history from props.
-      } = this.props;
-
+      const { history } = this.props;
       localStorage.removeItem('token'); // Removing Token from localStorage.
       history.push('/'); // Redirecting to Login page
     }
 
-    // When isDataLoad to true, it will run functions getAllAnswers() anda suffleAnswers() from AllAnswers.
-    // Saving data (questions) on STATE.
-
     this.setState(
-      {
-        data: response, // Saving requested data from the response of the requestDataAPI().
-        isDataLoad: true, // Using a conditional to run the functions.
-      },
+      { data: response, isDataLoad: true },
       () => this.getAllAnswers(), // runing function to get all the answers.
     );
     this.shuffleAllAnswers(allAnswers); // runing function using allAnswers.
     this.timer(); // runing function to start the countdown.
   }
 
-  // ************************** FUNCTIONS ************************** //
+  componentDidUpdate(_, prevState) {
+    const { dispatch } = this.props;
+    const { score, data, indexOfQuestions } = this.state;
+    const { score: oldScore, isAnswered: isOldAnswered } = prevState;
+    if (score !== oldScore) {
+      dispatch(ActionScore(score));
+      console.log(isOldAnswered, indexOfQuestions, data.length);
+    }
+  }
 
-  // Getting all answers (correct/incorrect), combining in a array and saving on STATE. indexOfQuestions is a helper to find the answers from the same question.
+  // correct_answer
+  // incorrect_answers
 
   getAllAnswers = () => {
-    const {
-      data, // Accessing data from STATE.
-      indexOfQuestions, // Accessing index of questions from STATE.
-    } = this.state;
-
+    const { data, indexOfQuestions } = this.state;
+    const incorrectAnswers = data[indexOfQuestions]?.incorrect_answers || [];
     const allAnswers = [ // Heare we are combinnig the correct and wrond answers.
-      data[indexOfQuestions].correct_answer, // Getting correct answer.
-      ...data[indexOfQuestions].incorrect_answers, // Getting wrong answer. Note that we are using spread operator ... to get all the incorrect answers.
+      data[indexOfQuestions]?.correct_answer, // Getting correct answer.
+      ...incorrectAnswers, // Getting wrong answer. Note that we are using spread operator ... to get all the incorrect answers.
     ];
     this.setState({ allAnswers: this.shuffleAllAnswers(allAnswers) }); // Saving  all the answers on STATE.
   };
@@ -76,14 +74,27 @@ class Game extends Component {
     return AllAnswers; // returning the answers shuffled
   };
 
-  isAnswerCorrect = () => {
+  isAnswerCorrect = (teste) => {
+    const { score, assertions } = this.state;
     this.setState({
       isAnswered: true, // when true, start the function
     });
 
+    if (teste === CORRECT_ANSWER) {
+      this.setState({
+        score: score + 1,
+        assertions: assertions + 1,
+      }, () => {
+        console.log();
+        // dispatch(ActionAssertions(state.assertions));
+      });
+    }
+
     const findCorrecttAnswer = document.getElementsByClassName(CORRECT_ANSWER); // Find the element of correct answer. It's necessary to set element.
-    findCorrecttAnswer[0].style.backgroundColor = 'rgb(51, 208, 51)'; // setting backgroundColorget of correct answer.
-    findCorrecttAnswer[0].style.border = '3px solid rgb(6, 240, 15)'; // setting boarder of correct answer.
+    if (findCorrecttAnswer.length > 0) {
+      findCorrecttAnswer[0].style.backgroundColor = 'rgb(51, 208, 51)'; // setting backgroundColorget of correct answer.
+      findCorrecttAnswer[0].style.border = '3px solid rgb(6, 240, 15)'; // setting boarder of correct answer.
+    }
 
     const findWrongAnswer = document.getElementsByClassName(WRONG_ANSWER); // Find the element of wrong answer. It's necessary to set element.
     for (let answer = 0; answer < findWrongAnswer.length; answer += 1) { // Create a loop to set all the wrong answers.
@@ -93,10 +104,7 @@ class Game extends Component {
   };
 
   timer = () => setInterval(() => {
-    const {
-      countdown, // Accessing countdown from STATE.
-    } = this.state;
-
+    const { countdown } = this.state;
     if (countdown > 0) { // If countdown is bigger than 0, start the loop to countdown.
       this.setState(
         (prevState) => ({
@@ -114,7 +122,29 @@ class Game extends Component {
     }
   }, ONE_SECOND);
 
-  // ************************** ---------- ************************** //
+  handleClickNextQuestion = () => {
+    const { indexOfQuestions } = this.state;
+    const { history } = this.props;
+    const num = 4;
+
+    this.setState({
+      isAnswered: false,
+      indexOfQuestions: indexOfQuestions + 1,
+      countdown: THIRTY_SECONDS,
+    }, () => {
+      console.log((indexOfQuestions + 1) > num, 'caiusi');
+      if ((indexOfQuestions + 1) > num) {
+        history.push('/feedback');
+      }
+      this.getAllAnswers();
+
+      const findWrongAnswer = document.getElementsByClassName(WRONG_ANSWER); // Find the element of wrong answer. It's necessary to set element.
+      Array.from(findWrongAnswer).forEach((element) => {
+        element.style.backgroundColor = ''; // setting backgroundColorget of correct wrong.
+        element.style.border = ''; // setting boarder of correct wrong.
+      });
+    });
+  };
 
   render() {
     const {
@@ -125,9 +155,10 @@ class Game extends Component {
       isDataLoad, // when true, renders the following informations
       countdown, // countdown to answer the question
     } = this.state;
-
+    // const totalNumberQuestion = 4;
     return (
       <div>
+        {/* {indexOfQuestions === totalNumberQuestion && <Redirect to="feedback" />} */}
         <header>
           <Header />
         </header>
@@ -137,12 +168,12 @@ class Game extends Component {
               <div />
               {isDataLoad && (
                 <h4 data-testid="question-category">
-                  {data[indexOfQuestions].category}
+                  {data[indexOfQuestions]?.category}
                 </h4> // getting the question category
               )}
               {isDataLoad && (
                 <h3 data-testid="question-text">
-                  {data[indexOfQuestions].question}
+                  {data[indexOfQuestions]?.question}
                 </h3> // getting the question
               )}
             </section>
@@ -150,26 +181,28 @@ class Game extends Component {
               {isDataLoad
                 && allAnswers.map((item, index) => ( // Using .map to go through all answers, to set informations.
                   <button
-                    id="answer"
                     data-testid={
-                      item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
+                      item === data[indexOfQuestions]?.correct_answer // using ternary operator to set the data-testid according to type of answer.
                         ? CORRECT_ANSWER // if answer is correct
                         : `${WRONG_ANSWER}-${index}` // if answer is wrong and index
                     }
                     value={
-                      item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
+                      item === data[indexOfQuestions]?.correct_answer // using ternary operator to set the data-testid according to type of answer.
                         ? CORRECT_ANSWER // if answer is correct
                         : `${WRONG_ANSWER}-${index}` // if answer is wrong and index
                     }
                     className={
-                      item === data[indexOfQuestions].correct_answer // using ternary operator to set the data-testid according to type of answer.
+                      item === data[indexOfQuestions]?.correct_answer // using ternary operator to set the data-testid according to type of answer.
                         ? CORRECT_ANSWER // if answer is correct
                         : WRONG_ANSWER // if answer is wrong and index
                     }
                     disabled={ isAnswered } // Setting isAnswered to false. Use to check if the user answered the question.
                     key={ index }
                     type="button"
-                    onClick={ this.isAnswerCorrect } // when button clicked run the function.
+                    onClick={ () => this
+                      .isAnswerCorrect(item === data[indexOfQuestions]?.correct_answer // using ternary operator to set the data-testid according to type of answer.
+                        ? CORRECT_ANSWER // if answer is correct
+                        : WRONG_ANSWER) } // when button clicked run the function.
                   >
                     {item}
                   </button>
@@ -182,7 +215,9 @@ class Game extends Component {
                 data-testid="btn-next"
                 type="button"
                 className="next_button"
+                onClick={ this.handleClickNextQuestion }
               >
+                {' '}
                 Next
               </button>
             )}
@@ -195,8 +230,10 @@ class Game extends Component {
 }
 
 Game.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
 };
+
 export default connect()(Game);
